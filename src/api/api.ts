@@ -1,29 +1,22 @@
-// src/api/api.ts
-import axios, { AxiosInstance } from 'axios';
+// 공통 axios 인스턴스 설정
+import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// 서버 주소를 실제 개발환경 IP로 바꿔주세요
 const SERVER_IP = '172.28.2.114';
-const PORT = '5000';
-const BASE_URL = `http://${SERVER_IP}:${PORT}/api`;
+const PORT      = '5000';
+const BASE_URL  = `http://${SERVER_IP}:${PORT}`;  // /auth/* 를 바로 호출
 
-const api: AxiosInstance = axios.create({
+const api = axios.create({
   baseURL: BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  headers: { 'Content-Type': 'application/json' },
 });
 
-// 요청 전 토큰이 있으면 Authorization 헤더에 추가
-api.interceptors.request.use(
-  async (config) => {
-    const token = await AsyncStorage.getItem('userToken');
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+api.interceptors.request.use(async config => {
+  const token = await AsyncStorage.getItem('userToken');
+  if (token && config.headers) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 export default api;
